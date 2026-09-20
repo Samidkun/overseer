@@ -1,0 +1,14 @@
+[Unit]
+Description=Overseer - Real-Time Agent Telemetry Daemon
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/mnt/data/01_Projects/Porto/overseer
+ExecStart=/mnt/data/01_Projects/Porto/overseer/.venv/bin/python -m backend.serve --port 7788 --host 127.0.0.1
+Restart=on-failure
+RestartSec=3s
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

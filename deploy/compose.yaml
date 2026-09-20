@@ -1,0 +1,14 @@
+services:
+  overseer:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    ports:
+      - "7788:7788"
+    environment:
+      PORT: "7788"
+      HOST: "0.0.0.0"
+    volumes:
+      - ~/.hermes/cache/delegation/live:/app/logs:ro
+    command: ["python3", "-m", "backend.serve", "--watch-dir", "/app/logs"]
+    restart: unless-stopped

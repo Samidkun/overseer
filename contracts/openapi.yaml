@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: Overseer Agent Telemetry API
+  version: "1.0.0"
+  description: Real-time telemetry, agent orchestration, and execution stream API.
+servers:
+  - url: /
+paths:
+  /api/telemetry/snapshot:
+    get:
+      summary: Retrieve current telemetry snapshot
+      operationId: getSnapshot
+      responses:
+        "200":
+          description: Current snapshot of all monitored agents and metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelemetrySnapshot"
+  /api/telemetry/stream:
+    get:
+      summary: Live Server-Sent Events (SSE) telemetry stream
+      operationId: streamTelemetry
+      responses:
+        "200":
+          description: Continuous stream of telemetry events and logs
+          content:
+            text/event-stream:
+              schema:
+                type: string
+  /api/telemetry/event:
+    post:
+      summary: Ingest telemetry event from an agent hook
+      operationId: ingestEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelemetryEvent"
+      responses:
+        "200":
+          description: Event accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: { type: boolean }
+        "400":
+          $ref: "#/components/responses/Error"
+components:
+  schemas:
+    SupervisorState:
+      type: object
+      required: [status, current_task, active_tool, model]
+      properties:
+        status: { type: string }
+        current_task: { type: string }
+        active_tool: { type: string }
+        model: { type: string }
+    SubagentState:
+      type: object
+      required: [id, name, role, type, status, running_seconds]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        role: { type: string }
+        type: { type: string, enum: [worker, reviewer] }
+        status: { type: string, enum: [IDLE, THINKING, TOOL_EXEC, STUCK_ALERT, COMPLETED] }
+        running_seconds: { type: number }
+        current_task: { type: string }
+        last_action: { type: string }
+    MetricsState:
+      type: object
+      required: [active_agents, wave, drift_gate, test_suite]
+      properties:
+        active_agents: { type: integer }
+        wave: { type: string }
+        drift_gate: { type: string }
+        test_suite: { type: string }
+    TelemetrySnapshot:
+      type: object
+      required: [supervisor, subagents, metrics]
+      properties:
+        supervisor:
+          $ref: "#/components/schemas/SupervisorState"
+        subagents:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubagentState"
+        metrics:
+          $ref: "#/components/schemas/MetricsState"
+    TelemetryEvent:
+      type: object
+      required: [type, data]
+      properties:
+        type: { type: string, enum: [log, agent_status, metric, task_start, task_end] }
+        agent_id: { type: string }
+        data: { type: object }
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+  responses:
+    Error:
+      description: Error envelope
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"

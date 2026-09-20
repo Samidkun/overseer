@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overseer — Real-Time Agent Telemetry</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="hud-container">
+    <!-- TOP STATUS STRIP: 2-SECOND GLANCEABLE HEALTH -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-badge">
+          <span class="pulse-dot"></span>
+          OVERSEER // MISSION CONTROL
+        </div>
+        <div class="project-tag">
+          <span class="dim">MONITORING:</span>
+          <span class="highlight" id="hudProjectName">Hermes Autonomous Fleet</span>
+        </div>
+      </div>
+
+      <!-- 2-Second Fleet Health Counters -->
+      <div class="fleet-health-strip">
+        <div class="health-pill active-pill">
+          <span class="h-dot green"></span>
+          <span class="h-label">ACTIVE</span>
+          <span class="h-count" id="countActive">0</span>
+        </div>
+        <div class="health-pill idle-pill">
+          <span class="h-dot gray"></span>
+          <span class="h-label">IDLE</span>
+          <span class="h-count" id="countIdle">0</span>
+        </div>
+        <div class="health-pill stuck-pill">
+          <span class="h-dot amber"></span>
+          <span class="h-label">STUCK</span>
+          <span class="h-count" id="countStuck">0</span>
+        </div>
+        <div class="health-pill error-pill">
+          <span class="h-dot red"></span>
+          <span class="h-label">ERROR</span>
+          <span class="h-count" id="countError">0</span>
+        </div>
+      </div>
+
+      <div class="hud-controls">
+        <div class="conn-status-badge" id="connStatus">
+          <span class="conn-indicator"></span>
+          <span id="connText">CONNECTING</span>
+        </div>
+        <div class="telemetry-clock" id="hudClock">00:00:00 WIB</div>
+      </div>
+    </header>
+
+    <!-- MAIN VIEWPORT -->
+    <main class="grid-layout">
+      <!-- 2D ANIME CHIBI TOPOLOGY CANVAS -->
+      <section class="viewport-canvas-box">
+        <div class="panel-header">
+          <div class="title-wrap">
+            <span class="icon">◈</span>
+            <h3>AGENT NEURAL CONSTELLATION</h3>
+          </div>
+          <div class="network-legend">
+            <span class="legend-item"><span class="dot main"></span> Supervisor</span>
+            <span class="legend-item"><span class="dot worker"></span> Workers</span>
+            <span class="legend-item"><span class="dot stuck"></span> Stuck Alert</span>
+            <span class="legend-item"><span class="dot reviewer"></span> Reviewer</span>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="topologyCanvas"></canvas>
+          <div class="overlay-tactical-grid"></div>
+
+          <!-- Interactive Simulation & Demo Triggers -->
+          <div class="canvas-controls">
+            <button class="sim-btn" id="btnSimWave1">Demo: Wave 1 (Coding)</button>
+            <button class="sim-btn" id="btnSimStuck">Demo: Stuck Alert</button>
+            <button class="sim-btn" id="btnSimReview">Demo: Security Hunter</button>
+            <button class="sim-btn" id="btnSimAllGreen">Demo: All Green</button>
+          </div>
+        </div>
+
+        <!-- TELEMETRY METRICS TICKER -->
+        <div class="canvas-metrics-bar">
+          <div class="metric-cell">
+            <span class="m-label">ACTIVE SUBAGENTS</span>
+            <span class="m-val" id="metricActiveAgents">0</span>
+          </div>
+          <div class="metric-cell">
+            <span class="m-label">CURRENT WAVE</span>
+            <span class="m-val" id="metricWave">IDLE</span>
+          </div>
+          <div class="metric-cell">
+            <span class="m-label">SPEC DRIFT GATE</span>
+            <span class="m-val green" id="metricDriftGate">AC-1..11 GREEN</span>
+          </div>
+          <div class="metric-cell">
+            <span class="m-label">TEST COVERAGE</span>
+            <span class="m-val green" id="metricTestSuite">ALL PASS</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT SIDEBAR: AGENT DETAILS & TERMINAL FEED -->
+      <aside class="viewport-sidebar">
+        <!-- SUPERVISOR AGENT CARD -->
+        <div class="agent-card supervisor">
+          <div class="card-head">
+            <div class="node-id-tag">
+              <span class="node-icon">◈</span>
+              <strong>SUPERVISOR COMMANDER</strong>
+              <span class="tag-sub" id="supervisorModel">ag/gemini-3.8-flash</span>
+            </div>
+            <span class="status-badge running" id="mainStatusBadge">ORCHESTRATING</span>
+          </div>
+          <div class="card-body">
+            <div class="current-task-row">
+              <span class="task-prompt-label">DIRECTIVE:</span>
+              <div class="task-desc" id="mainCurrentTask">Overseeing autonomous agent operations & telemetry.</div>
+            </div>
+            <div class="active-tool-banner">
+              <span class="tool-label">ACTIVE TOOL:</span>
+              <code id="mainActiveTool">monitoring</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBAGENT ROSTER -->
+        <div class="subagents-section">
+          <div class="section-label-bar">
+            <span>SUBAGENT ROSTER</span>
+            <span class="count-pill" id="subagentCountPill">0 WORKERS</span>
+          </div>
+          <div class="subagents-list" id="subagentsContainer">
+            <!-- Dynamically populated worker cards -->
+          </div>
+        </div>
+
+        <!-- TACTICAL TERMINAL FEED -->
+        <div class="terminal-panel">
+          <div class="terminal-head">
+            <div class="term-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="term-title">LIVE TELEMETRY STREAM // TOOL TRACES</span>
+            <button class="term-clear-btn" id="btnClearLog">CLEAR</button>
+          </div>
+          <div class="terminal-body" id="terminalFeed">
+            <!-- Logs stream here -->
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

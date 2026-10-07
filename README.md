@@ -1,5 +1,11 @@
 # Overseer — Real-Time Agent Telemetry & Visualizer Dashboard
 
+
+
+<p align="center">
+  <img src="docs/screenshots/preview.png" alt="Application Preview" width="100%" style="border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);" />
+</p>
+
 A lightweight, zero-dependency visual mission control for autonomous AI agents (Hermes & background subagents). Built using the Spec-Driven Development (SDD) SOP with an animated 2D Anime Chibi topology canvas.
 
 ## Features
